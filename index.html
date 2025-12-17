@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Pick a Song</title>
+
+<!-- Custom Font -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+body {
+  margin: 0; min-height: 100vh;
+  background: linear-gradient(160deg, #1a1a1a, #0f0f0f);
+  display: flex; justify-content: center; align-items: center;
+  color: white; overflow-x: hidden;
+}
+.container { width: 100%; max-width: 420px; padding: 20px; transition: all 0.4s ease; }
+
+/* SONG PICK SCREEN */
+h1 { text-align: center; letter-spacing: 3px; margin-bottom: 25px; }
+.song-card {
+  background: rgba(255,255,255,0.08); backdrop-filter: blur(6px);
+  border-radius: 18px; padding: 14px; display: flex; align-items: center;
+  margin-bottom: 15px; cursor: pointer; transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.song-card:hover { transform: scale(1.05); background: rgba(255,255,255,0.15); }
+.album { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; margin-right: 15px; }
+.song-info h2 { margin: 0; font-size: 16px; }
+.song-info p { margin: 4px 0 0; font-size: 13px; opacity: 0.7; }
+
+/* LETTER SCREEN */
+#letterScreen { display: none; text-align: center; }
+.envelope-container { position: relative; width: 250px; height: 150px; margin: 0 auto; perspective: 600px; }
+
+/* ENVELOPE */
+.envelope {
+  width: 250px; height: 150px; background: #fdfdfd; border-radius: 8px;
+  position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  cursor: pointer; transform-style: preserve-3d;
+  transition: transform 0.8s ease, box-shadow 0.4s ease;
+}
+.envelope:hover { box-shadow: 0 12px 25px rgba(255,255,255,0.4),0 8px 20px rgba(0,0,0,0.3); }
+/* FLAP */
+.envelope .flap {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 250px; height: 150px; background: #e0e0e0;
+  transform-origin: top; clip-path: polygon(0 0,50% 50%,100% 0);
+  transition: transform 0.8s ease, box-shadow 0.4s ease;
+}
+.envelope.open .flap { transform: rotateX(-180deg); box-shadow: 0 12px 25px rgba(255,255,255,0.4); }
+
+/* PAPER */
+.paper {
+  position: absolute; top: 0; left: 0; width: 240px; height: 300px;
+  background: rgba(255,255,255,0.95); border-radius: 8px; padding: 25px;
+  font-family: 'Roboto Slab', serif; font-size: 16px; color: black;
+  opacity: 0; transform: translateY(0px) rotate(-5deg);
+  transition: all 0.8s cubic-bezier(0.65,0,0.35,1);
+  white-space: pre-wrap; line-height: 1.6; box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+  touch-action: manipulation;
+}
+.paper.show { opacity:1; transform:translateY(-320px) rotate(0deg);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.5), 0 0 15px rgba(255,255,255,0.3);
+}
+.paper::-webkit-scrollbar { width:6px; }
+.paper::-webkit-scrollbar-track { background: transparent; }
+.paper::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); border-radius:3px; }
+
+/* OPEN LETTER BUTTON */
+.open-btn {
+  margin-top: 20px; padding: 12px 28px; border-radius: 30px;
+  background: rgba(255,255,255,0.9); color:black; border:none; font-size:14px;
+  cursor:pointer; transition: all 0.3s ease; backdrop-filter: blur(5px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.open-btn:disabled { cursor: default; opacity: 0.5; }
+.open-btn:hover:not(:disabled) { transform: scale(1.05); }
+
+/* SONG END UI */
+#songEndUI { display:none; margin-top:20px; opacity:0; transform: translateY(20px); transition: all 0.6s ease; }
+#songEndUI button {
+  padding: 12px 26px; margin:6px; border-radius:25px; border:none; font-size:14px;
+  cursor:pointer; transition: all 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(5px); background: rgba(255,255,255,0.9); color:black;
+  box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+#songEndUI button:hover { transform: scale(1.1); opacity:1; box-shadow:0 6px 20px rgba(255,255,255,0.4); }
+
+</style>
+</head>
+<body>
+
+<!-- SONG PICK SCREEN -->
+<div class="container" id="songScreen">
+  <h1>PICK A SONG</h1>
+
+  <div class="song-card" onclick="selectSong(0)">
+    <img src="yellow.jpg" class="album">
+    <div class="song-info">
+      <h2>YELLOW</h2>
+      <p>Coldplay</p>
+    </div>
+  </div>
+
+  <div class="song-card" onclick="selectSong(1)">
+    <img src="sanctuary.jpg" class="album">
+    <div class="song-info">
+      <h2>SANCTUARY</h2>
+      <p>Joji</p>
+    </div>
+  </div>
+
+  <div class="song-card" onclick="selectSong(2)">
+    <img src="lastchristmas.jpg" class="album">
+    <div class="song-info">
+      <h2>LAST CHRISTMAS</h2>
+      <p>Wham!</p>
+    </div>
+  </div>
+</div>
+
+<!-- LETTER SCREEN -->
+<div class="container" id="letterScreen">
+  <div class="envelope-container">
+    <div class="envelope" id="envelope"><div class="flap"></div></div>
+    <div class="paper" id="letterText"></div>
+  </div>
+  <button class="open-btn" id="openButton" onclick="openLetter()">OPEN LETTER</button>
+
+  <div id="songEndUI">
+    <button onclick="replaySong()">REPLAY SONG</button>
+    <button onclick="changeSong()">CHANGE SONG</button>
+  </div>
+</div>
+
+<!-- AUDIO -->
+<audio src="yellow.mp3"></audio>
+<audio src="sanctuary.mp3"></audio>
+<audio src="lastchristmas.mp3"></audio>
+
+<script>
+const audios = document.querySelectorAll("audio");
+let letterContent = "";
+let currentSongIndex = 0;
+let letterOpened = false;
+
+/* LOAD LETTER FILE */
+fetch("letter.txt")
+  .then(res => res.text())
+  .then(text => letterContent = text);
+
+/* SONG SELECTION */
+function selectSong(index) {
+  currentSongIndex = index;
+  audios.forEach((a,i)=>{ a.pause(); a.currentTime=0; if(i===index) a.play(); });
+
+  document.getElementById("songScreen").style.display="none";
+  document.getElementById("letterScreen").style.display="block";
+
+  const envelope=document.getElementById("envelope");
+  envelope.classList.remove("open");
+  const letter=document.getElementById("letterText");
+  letter.style.opacity=0; letter.style.transform="translateY(0px) rotate(-5deg)"; letter.textContent="";
+  letterOpened=false;
+
+  const btn=document.getElementById("openButton"); btn.disabled=false;
+
+  const songEndUI=document.getElementById("songEndUI");
+  songEndUI.style.display="none"; songEndUI.style.opacity=0; songEndUI.style.transform="translateY(20px)";
+}
+
+/* OPEN LETTER */
+function openLetter() {
+  if(letterOpened) return;
+  letterOpened=true;
+
+  const envelope=document.getElementById("envelope");
+  envelope.classList.add("open");
+
+  const letter=document.getElementById("letterText");
+  setTimeout(()=>{ letter.classList.add("show"); },600);
+
+  let i=0;
+  const typing=setInterval(()=>{
+    letter.textContent+=letterContent.charAt(i); i++;
+    if(i>=letterContent.length) clearInterval(typing);
+  },40);
+
+  document.getElementById("openButton").disabled=true;
+}
+
+/* SONG END DETECTION */
+audios.forEach((audio,index)=>{
+  audio.addEventListener('ended',()=>{
+    if(index===currentSongIndex){
+      const songEndUI=document.getElementById("songEndUI");
+      songEndUI.style.display="block";
+      setTimeout(()=>{ songEndUI.style.opacity=1; songEndUI.style.transform="translateY(0)"; },50);
+    }
+  });
+});
+
+/* REPLAY SONG */
+function replaySong(){
+  const audio=audios[currentSongIndex];
+  audio.currentTime=0; audio.play();
+
+  const envelope=document.getElementById("envelope");
+  envelope.classList.remove("open");
+  const letter=document.getElementById("letterText");
+  letter.style.opacity=0; letter.style.transform="translateY(0px) rotate(-5deg)"; letter.textContent="";
+  letterOpened=false;
+
+  const btn=document.getElementById("openButton"); btn.disabled=false;
+
+  const songEndUI=document.getElementById("songEndUI");
+  songEndUI.style.display="none"; songEndUI.style.opacity=0; songEndUI.style.transform="translateY(20px)";
+}
+
+/* CHANGE SONG */
+function changeSong(){
+  audios.forEach(a=>{ a.pause(); a.currentTime=0; });
+
+  document.getElementById("letterScreen").style.display="none";
+  document.getElementById("songScreen").style.display="block";
+
+  const songEndUI=document.getElementById("songEndUI");
+  songEndUI.style.display="none"; songEndUI.style.opacity=0; songEndUI.style.transform="translateY(20px)";
+}
+</script>
+
+</body>
+</html>
